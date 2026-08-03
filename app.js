@@ -597,3 +597,107 @@ ${data.username}
 };
 
 }
+// ==================================
+// PRIVATE CHAT
+// ==================================
+
+import {
+
+addDoc,
+collection,
+onSnapshot,
+query,
+orderBy,
+serverTimestamp
+
+}
+
+from
+
+"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+
+
+const sendChat =
+document.getElementById("sendChat");
+
+
+const chatInput =
+document.getElementById("chatInput");
+
+
+const chatMessages =
+document.getElementById("chatMessages");
+
+
+
+const params =
+new URLSearchParams(
+window.location.search
+);
+
+
+
+const receiver =
+params.get("user");
+
+
+
+if(receiver){
+
+
+document.getElementById("chatUser").innerText =
+receiver;
+
+
+}
+
+
+
+if(sendChat){
+
+
+sendChat.onclick = async()=>{
+
+
+const text =
+chatInput.value.trim();
+
+
+
+if(!text) return;
+
+
+
+const user =
+auth.currentUser;
+
+
+
+await addDoc(
+
+collection(db,"messages"),
+
+{
+
+text:text,
+
+sender:user.uid,
+
+receiver:receiver,
+
+time:serverTimestamp()
+
+}
+
+);
+
+
+
+chatInput.value="";
+
+
+};
+
+
+}
