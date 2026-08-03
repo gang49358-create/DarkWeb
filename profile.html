@@ -26,11 +26,16 @@
 <div class="profile-card">
 
 
-<div class="avatar-big">
+<img id="avatar"
+class="avatar-big"
+src="assets/avatar.png">
 
-👤
 
-</div>
+<input 
+type="file"
+id="avatarInput"
+accept="image/*">
+
 
 
 <h1 id="profileUsername">
@@ -38,17 +43,25 @@
 </h1>
 
 
-<span class="status">
 
-🟢 Online
-
-</span>
-
-
-
-<input 
+<textarea
 id="description"
 placeholder="Описание профиля">
+</textarea>
+
+
+
+<label>
+
+<input 
+type="checkbox"
+id="onlineStatus"
+checked>
+
+Показывать Online
+
+</label>
+
 
 
 <button id="saveProfile">
@@ -59,40 +72,12 @@ placeholder="Описание профиля">
 
 
 
-<div class="premium">
-
-
-<h2>
-💎 Dark Premium
-</h2>
-
-
-<p>
-
-Эксклюзивные функции и оформление
-
-</p>
-
-
-<button>
-
-Активировать
-
-</button>
-
-
-</div>
-
-
-
 </div>
 
 
 </div>
 
 
-
-<script type="module" src="firebase.js"></script>
 
 <script type="module" src="app.js"></script>
 
