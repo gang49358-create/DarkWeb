@@ -598,16 +598,17 @@ ${data.username}
 
 }
 // ==================================
-// PRIVATE CHAT
+// DARKWEB PRIVATE CHAT SYSTEM
 // ==================================
 
 import {
 
 addDoc,
 collection,
-onSnapshot,
 query,
+where,
 orderBy,
+onSnapshot,
 serverTimestamp
 
 }
@@ -631,28 +632,45 @@ document.getElementById("chatMessages");
 
 
 
-const params =
-new URLSearchParams(
-window.location.search
-);
+const urlParams =
+new URLSearchParams(window.location.search);
 
 
 
 const receiver =
-params.get("user");
+urlParams.get("user");
 
 
 
 if(receiver){
 
-
 document.getElementById("chatUser").innerText =
 receiver;
-
 
 }
 
 
+
+let currentUser = null;
+
+
+
+onAuthStateChanged(auth,(user)=>{
+
+
+currentUser=user;
+
+
+loadMessages();
+
+
+});
+
+
+
+
+
+// отправка сообщения
 
 if(sendChat){
 
@@ -665,12 +683,8 @@ chatInput.value.trim();
 
 
 
-if(!text) return;
-
-
-
-const user =
-auth.currentUser;
+if(!text || !currentUser)
+return;
 
 
 
@@ -680,13 +694,21 @@ collection(db,"messages"),
 
 {
 
+
 text:text,
 
-sender:user.uid,
 
-receiver:receiver,
+sender:
+currentUser.uid,
 
-time:serverTimestamp()
+
+receiver:
+receiver,
+
+
+time:
+serverTimestamp()
+
 
 }
 
@@ -698,6 +720,85 @@ chatInput.value="";
 
 
 };
+
+
+}
+
+
+
+
+// загрузка сообщений
+
+
+function loadMessages(){
+
+
+if(!currentUser || !receiver)
+return;
+
+
+
+const q =
+query(
+
+collection(db,"messages"),
+
+
+where(
+"sender",
+"==",
+currentUser.uid
+),
+
+where(
+"receiver",
+"==",
+receiver
+),
+
+orderBy(
+"time"
+)
+
+);
+
+
+
+
+onSnapshot(q,(snapshot)=>{
+
+
+chatMessages.innerHTML="";
+
+
+
+snapshot.forEach((doc)=>{
+
+
+const data =
+doc.data();
+
+
+
+chatMessages.innerHTML += `
+
+
+<div class="chat-message my-message">
+
+${data.text}
+
+</div>
+
+
+`;
+
+
+
+});
+
+
+
+});
 
 
 }
