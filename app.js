@@ -493,3 +493,107 @@ alert("Профиль сохранён 🟢");
 
 
 }
+// ==================================
+// SEARCH USERS
+// ==================================
+
+
+import {
+
+collection,
+getDocs
+
+}
+
+from
+
+"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+
+
+const searchButton =
+document.getElementById("searchButton");
+
+
+const searchUser =
+document.getElementById("searchUser");
+
+
+const results =
+document.getElementById("results");
+
+
+
+if(searchButton){
+
+
+searchButton.onclick = async()=>{
+
+
+const value =
+searchUser.value.trim();
+
+
+
+results.innerHTML="";
+
+
+
+const users =
+await getDocs(
+collection(db,"users")
+);
+
+
+
+users.forEach((item)=>{
+
+
+const data =
+item.data();
+
+
+
+if(
+data.username === value ||
+data.username === "@"+value.replace("@","")
+){
+
+
+
+results.innerHTML += `
+
+
+<div class="user-result">
+
+<h3>
+
+${data.username}
+
+</h3>
+
+
+<span>
+
+🟢 DarkWeb User
+
+</span>
+
+
+</div>
+
+
+`;
+
+
+
+}
+
+
+
+});
+
+
+};
+
+}
