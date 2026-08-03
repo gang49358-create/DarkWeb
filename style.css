@@ -1469,3 +1469,63 @@ font-size:14px;
 margin-top:5px;
 
 }
+/* ===========================
+TELEGRAM STYLE CHAT
+=========================== */
+
+
+.chat-message{
+
+padding:12px 16px;
+
+border-radius:18px;
+
+margin:10px;
+
+max-width:70%;
+
+word-wrap:break-word;
+
+}
+
+
+
+.my-message{
+
+margin-left:auto;
+
+background:#00ff88;
+
+color:black;
+
+}
+
+
+
+.other-message{
+
+margin-right:auto;
+
+background:#191919;
+
+color:white;
+
+border:1px solid #333;
+
+}
+
+
+
+.message-time{
+
+display:block;
+
+font-size:11px;
+
+opacity:.6;
+
+margin-top:5px;
+
+text-align:right;
+
+}
