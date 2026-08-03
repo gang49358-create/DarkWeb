@@ -1008,3 +1008,140 @@ color:white;
 box-shadow:0 0 15px rgba(0,255,136,.1);
 
 }
+/* ===========================
+PROFILE
+=========================== */
+
+
+.profile-page{
+
+min-height:100vh;
+
+display:flex;
+
+justify-content:center;
+
+align-items:center;
+
+padding:30px;
+
+}
+
+
+.profile-card{
+
+width:430px;
+
+background:#101010;
+
+border:1px solid #252525;
+
+border-radius:25px;
+
+padding:40px;
+
+text-align:center;
+
+box-shadow:0 0 40px rgba(0,255,136,.15);
+
+}
+
+
+
+.avatar-big{
+
+width:120px;
+
+height:120px;
+
+margin:auto;
+
+border-radius:50%;
+
+background:#00ff88;
+
+display:flex;
+
+align-items:center;
+
+justify-content:center;
+
+font-size:50px;
+
+color:black;
+
+box-shadow:0 0 35px #00ff88;
+
+}
+
+
+.status{
+
+display:block;
+
+color:#00ff88;
+
+margin:15px;
+
+}
+
+
+
+.profile-card input{
+
+width:100%;
+
+padding:15px;
+
+background:#181818;
+
+border:1px solid #333;
+
+border-radius:14px;
+
+color:white;
+
+margin:20px 0;
+
+}
+
+
+
+.profile-card button{
+
+background:#00ff88;
+
+border:none;
+
+padding:15px 30px;
+
+border-radius:14px;
+
+font-weight:bold;
+
+cursor:pointer;
+
+}
+
+
+
+.premium{
+
+margin-top:35px;
+
+padding:25px;
+
+background:#151515;
+
+border-radius:18px;
+
+border:1px solid #333;
+
+}
+
+
+.premium h2{
+
+color:#00ff88;
+
+}
