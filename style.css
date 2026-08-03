@@ -1249,3 +1249,87 @@ border:1px solid #333;
 color:#00ff88;
 
 }
+/* ===========================
+PRIVATE CHAT
+=========================== */
+
+
+.chat-window{
+
+height:100vh;
+
+display:flex;
+
+flex-direction:column;
+
+}
+
+
+
+.chat-top{
+
+height:80px;
+
+display:flex;
+
+justify-content:space-between;
+
+align-items:center;
+
+padding:20px 30px;
+
+border-bottom:1px solid #222;
+
+}
+
+
+
+.chat-top a{
+
+color:#00ff88;
+
+text-decoration:none;
+
+}
+
+
+
+.chat-messages{
+
+flex:1;
+
+padding:30px;
+
+overflow-y:auto;
+
+}
+
+
+
+.chat-message{
+
+background:#151515;
+
+border:1px solid #333;
+
+padding:14px;
+
+border-radius:16px;
+
+margin-bottom:12px;
+
+max-width:70%;
+
+}
+
+
+
+.my-message{
+
+margin-left:auto;
+
+background:#00ff8820;
+
+border-color:#00ff88;
+
+}
