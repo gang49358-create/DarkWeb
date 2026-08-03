@@ -1333,3 +1333,37 @@ background:#00ff8820;
 border-color:#00ff88;
 
 }
+/* ===========================
+ MINI PROFILE
+=========================== */
+
+
+.mini-avatar{
+
+width:45px;
+
+height:45px;
+
+border-radius:50%;
+
+object-fit:cover;
+
+background:#00ff88;
+
+}
+
+
+#userName{
+
+font-weight:600;
+
+}
+
+
+#userStatus{
+
+font-size:13px;
+
+color:#00ff88;
+
+}
