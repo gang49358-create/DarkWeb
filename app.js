@@ -863,3 +863,223 @@ window.location.href =
 
 
 }
+// ==================================
+// TELEGRAM STYLE PRIVATE CHAT
+// ==================================
+
+
+const chatMessages =
+document.getElementById("chatMessages");
+
+
+const chatInput =
+document.getElementById("chatInput");
+
+
+const sendChat =
+document.getElementById("sendChat");
+
+
+
+const params =
+new URLSearchParams(
+window.location.search
+);
+
+
+const chatUsername =
+params.get("user");
+
+
+
+const chatTitle =
+document.getElementById("chatUser");
+
+
+if(chatTitle){
+
+chatTitle.innerText =
+chatUsername;
+
+}
+
+
+
+let myUID = null;
+
+
+
+onAuthStateChanged(auth,(user)=>{
+
+
+if(user){
+
+
+myUID =
+user.uid;
+
+
+loadPrivateMessages();
+
+
+}
+
+
+});
+
+
+
+
+
+async function loadPrivateMessages(){
+
+
+if(!chatMessages)
+return;
+
+
+
+const messagesQuery =
+query(
+
+collection(db,"messages"),
+
+orderBy("time")
+
+);
+
+
+
+onSnapshot(messagesQuery,(snapshot)=>{
+
+
+chatMessages.innerHTML="";
+
+
+
+snapshot.forEach((item)=>{
+
+
+const data =
+item.data();
+
+
+
+if(
+
+(data.sender === myUID &&
+data.receiver === chatUsername)
+
+||
+
+(data.sender === chatUsername &&
+data.receiver === myUID)
+
+){
+
+
+
+const mine =
+data.sender === myUID;
+
+
+
+chatMessages.innerHTML += `
+
+
+<div class="chat-message 
+${mine ? "my-message" : "other-message"}">
+
+
+${data.text}
+
+
+<span class="message-time">
+
+${
+
+data.time ?
+
+new Date(
+data.time.toDate()
+).toLocaleTimeString()
+
+:
+
+""
+
+}
+
+</span>
+
+
+</div>
+
+
+`;
+
+
+
+}
+
+
+
+});
+
+
+
+chatMessages.scrollTop =
+chatMessages.scrollHeight;
+
+
+
+});
+
+
+}
+
+
+
+
+if(sendChat){
+
+
+sendChat.onclick=async()=>{
+
+
+const text =
+chatInput.value.trim();
+
+
+
+if(!text)return;
+
+
+
+await addDoc(
+
+collection(db,"messages"),
+
+{
+
+text:text,
+
+sender:myUID,
+
+receiver:chatUsername,
+
+time:serverTimestamp()
+
+}
+
+);
+
+
+
+chatInput.value="";
+
+
+};
+
+
+}
