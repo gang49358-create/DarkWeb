@@ -1,6 +1,5 @@
 // ==================================
-// DARKWEB APP.JS
-// Авторизация + регистрация
+// DARKWEB APP.JS v1
 // ==================================
 
 import { auth, db } from "./firebase.js";
@@ -15,34 +14,48 @@ signOut
 
 
 import {
+
 doc,
 setDoc,
-getDoc
+getDoc,
+updateDoc,
+collection,
+addDoc,
+getDocs,
+onSnapshot,
+query,
+orderBy,
+serverTimestamp
+
 }
 from
 "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 
-// ===============================
-// РЕГИСТРАЦИЯ
-// ===============================
 
-const registerForm = document.getElementById("registerForm");
+// ==================================
+// РЕГИСТРАЦИЯ
+// ==================================
+
+const registerForm =
+document.getElementById("registerForm");
 
 
 if(registerForm){
 
+
 registerForm.addEventListener("submit", async(e)=>{
+
 
 e.preventDefault();
 
 
 const username =
-document.getElementById("username").value;
+document.getElementById("username").value.trim();
 
 
 const email =
-document.getElementById("registerEmail").value;
+document.getElementById("registerEmail").value.trim();
 
 
 const password =
@@ -53,7 +66,7 @@ document.getElementById("registerPassword").value;
 try{
 
 
-const userCredential =
+const result =
 await createUserWithEmailAndPassword(
 auth,
 email,
@@ -62,13 +75,10 @@ password
 
 
 
-const user =
-userCredential.user;
-
-
-
 await setDoc(
-doc(db,"users",user.uid),
+
+doc(db,"users",result.user.uid),
+
 {
 
 username:
@@ -80,6 +90,8 @@ username
 
 email:email,
 
+description:"",
+
 created:
 new Date()
 
@@ -89,7 +101,7 @@ new Date()
 
 
 
-alert("Аккаунт DarkWeb создан 🟢");
+alert("DarkWeb аккаунт создан 🟢");
 
 
 window.location.href="home.html";
@@ -111,10 +123,11 @@ alert(error.message);
 
 
 
-// ===============================
-// ВХОД
-// ===============================
 
+
+// ==================================
+// ВХОД
+// ==================================
 
 const loginForm =
 document.getElementById("loginForm");
@@ -129,10 +142,8 @@ loginForm.addEventListener("submit",async(e)=>{
 e.preventDefault();
 
 
-
 const email =
-document.getElementById("email").value;
-
+document.getElementById("email").value.trim();
 
 
 const password =
@@ -144,9 +155,13 @@ try{
 
 
 await signInWithEmailAndPassword(
+
 auth,
+
 email,
+
 password
+
 );
 
 
@@ -158,10 +173,13 @@ window.location.href="home.html";
 
 catch(error){
 
-alert("Ошибка входа: "+error.message);
+alert(
+"Ошибка входа: "
++
+error.message
+);
 
 }
-
 
 
 });
@@ -172,10 +190,10 @@ alert("Ошибка входа: "+error.message);
 
 
 
-// ===============================
-// ПРОВЕРКА АВТОРИЗАЦИИ
-// ===============================
 
+// ==================================
+// ПРОВЕРКА ПОЛЬЗОВАТЕЛЯ
+// ==================================
 
 onAuthStateChanged(auth,(user)=>{
 
@@ -184,10 +202,10 @@ const protectedPages=[
 
 "home.html",
 "profile.html",
-"settings.html"
+"contacts.html",
+"chat.html"
 
 ];
-
 
 
 const page =
@@ -196,36 +214,47 @@ window.location.pathname;
 
 
 if(
-protectedPages.some(p=>page.includes(p))
+
+protectedPages.some(
+(item)=>page.includes(item)
+)
+
 &&
 !user
+
 ){
+
 
 window.location.href="login.html";
 
+
 }
+
 
 
 });
 
 
 
-// ===============================
+
+
+
+// ==================================
 // ВЫХОД
-// ===============================
+// ==================================
 
-
-const logoutButton =
+const logout =
 document.getElementById("logout");
 
 
-if(logoutButton){
+if(logout){
 
 
-logoutButton.onclick=()=>{
+logout.onclick=async()=>{
 
 
-signOut(auth);
+await signOut(auth);
+
 
 window.location.href="login.html";
 
@@ -234,31 +263,209 @@ window.location.href="login.html";
 
 
 }
+
+
+
+
+
 // ==================================
-// DARKWEB MESSAGES
+// ПРОФИЛЬ
 // ==================================
 
+const profileUsername =
+document.getElementById("profileUsername");
 
-import {
 
-collection,
-addDoc,
-onSnapshot,
-query,
-orderBy,
-serverTimestamp
+const description =
+document.getElementById("description");
+
+
+const saveProfile =
+document.getElementById("saveProfile");
+
+
+
+if(profileUsername){
+
+
+onAuthStateChanged(auth,async(user)=>{
+
+
+if(user){
+
+
+const snap =
+await getDoc(
+doc(db,"users",user.uid)
+);
+
+
+
+if(snap.exists()){
+
+
+const data =
+snap.data();
+
+
+
+profileUsername.innerText =
+data.username;
+
+
+
+description.value =
+data.description || "";
+
 
 }
 
-from
 
-"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
+}
 
 
+});
 
 
-const sendButton =
+}
+
+
+
+
+if(saveProfile){
+
+
+saveProfile.onclick=async()=>{
+
+
+const user =
+auth.currentUser;
+
+
+if(!user)return;
+
+
+
+await updateDoc(
+
+doc(db,"users",user.uid),
+
+{
+
+description:
+description.value
+
+}
+
+);
+
+
+
+alert("Профиль обновлён 🟢");
+
+
+};
+
+
+}
+
+
+
+
+
+
+// ==================================
+// ПОИСК ПОЛЬЗОВАТЕЛЕЙ
+// ==================================
+
+const searchButton =
+document.getElementById("searchButton");
+
+
+const searchInput =
+document.getElementById("searchUser");
+
+
+const results =
+document.getElementById("results");
+
+
+
+if(searchButton){
+
+
+searchButton.onclick=async()=>{
+
+
+const search =
+searchInput.value.trim();
+
+
+
+results.innerHTML="";
+
+
+
+const users =
+await getDocs(
+collection(db,"users")
+);
+
+
+
+users.forEach((item)=>{
+
+
+const data =
+item.data();
+
+
+
+if(
+
+data.username === search
+||
+data.username === "@"+search.replace("@","")
+
+){
+
+
+results.innerHTML += `
+
+<div class="user-result">
+
+<h3>${data.username}</h3>
+
+<span>
+🟢 DarkWeb User
+</span>
+
+</div>
+
+`;
+
+
+}
+
+
+
+});
+
+
+};
+
+
+}
+
+
+
+
+
+// ==================================
+// ОБЩИЙ ЧАТ
+// ==================================
+
+const sendMessage =
 document.getElementById("sendMessage");
 
 
@@ -266,16 +473,15 @@ const messageInput =
 document.getElementById("messageInput");
 
 
-
-const messagesBox =
+const messages =
 document.querySelector(".messages");
 
 
 
-if(sendButton){
+if(sendMessage){
 
 
-sendButton.onclick = async()=>{
+sendMessage.onclick=async()=>{
 
 
 const text =
@@ -283,7 +489,7 @@ messageInput.value.trim();
 
 
 
-if(!text) return;
+if(!text)return;
 
 
 
@@ -314,8 +520,7 @@ messageInput.value="";
 
 
 
-
-if(messagesBox){
+if(messages){
 
 
 const q =
@@ -329,224 +534,13 @@ orderBy("time")
 
 
 
-onSnapshot(q,(snapshot)=>{
+onSnapshot(q,(snap)=>{
 
 
-messagesBox.innerHTML="";
+messages.innerHTML="";
 
 
-
-snapshot.forEach((doc)=>{
-
-
-const data =
-doc.data();
-
-
-
-messagesBox.innerHTML += `
-
-
-<div class="message">
-
-
-<p>
-
-${data.text}
-
-</p>
-
-
-</div>
-
-
-`;
-
-
-});
-
-
-});
-
-
-}
-// ==================================
-// DARKWEB PROFILE
-// ==================================
-
-import {
-getDoc,
-updateDoc
-}
-from
-"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
-import {
-onAuthStateChanged
-}
-from
-"https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-
-
-// Элементы профиля
-
-const profileUsername =
-document.getElementById("profileUsername");
-
-const descriptionInput =
-document.getElementById("description");
-
-const saveProfile =
-document.getElementById("saveProfile");
-
-
-
-// загрузка профиля
-
-if(profileUsername){
-
-
-onAuthStateChanged(auth, async(user)=>{
-
-
-if(user){
-
-
-const userRef =
-doc(db,"users",user.uid);
-
-
-
-const userSnap =
-await getDoc(userRef);
-
-
-
-if(userSnap.exists()){
-
-
-const data =
-userSnap.data();
-
-
-
-profileUsername.innerText =
-data.username;
-
-
-
-descriptionInput.value =
-data.description || "";
-
-
-}
-
-
-
-}
-
-
-});
-
-
-}
-
-
-
-
-// сохранение описания
-
-if(saveProfile){
-
-
-saveProfile.onclick = async()=>{
-
-
-const user =
-auth.currentUser;
-
-
-
-if(!user) return;
-
-
-
-await updateDoc(
-
-doc(db,"users",user.uid),
-
-{
-
-description:
-descriptionInput.value
-
-}
-
-);
-
-
-
-alert("Профиль сохранён 🟢");
-
-
-};
-
-
-}
-// ==================================
-// SEARCH USERS
-// ==================================
-
-
-import {
-
-collection,
-getDocs
-
-}
-
-from
-
-"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
-
-
-const searchButton =
-document.getElementById("searchButton");
-
-
-const searchUser =
-document.getElementById("searchUser");
-
-
-const results =
-document.getElementById("results");
-
-
-
-if(searchButton){
-
-
-searchButton.onclick = async()=>{
-
-
-const value =
-searchUser.value.trim();
-
-
-
-results.innerHTML="";
-
-
-
-const users =
-await getDocs(
-collection(db,"users")
-);
-
-
-
-users.forEach((item)=>{
+snap.forEach((item)=>{
 
 
 const data =
@@ -554,248 +548,18 @@ item.data();
 
 
 
-if(
-data.username === value ||
-data.username === "@"+value.replace("@","")
-){
+messages.innerHTML += `
 
-
-
-results.innerHTML += `
-
-
-<div class="user-result">
-
-<h3>
-
-${data.username}
-
-</h3>
-
-
-<span>
-
-🟢 DarkWeb User
-
-</span>
-
-
-</div>
-
-
-`;
-
-
-
-}
-
-
-
-});
-
-
-};
-
-}
-// ==================================
-// DARKWEB PRIVATE CHAT SYSTEM
-// ==================================
-
-import {
-
-addDoc,
-collection,
-query,
-where,
-orderBy,
-onSnapshot,
-serverTimestamp
-
-}
-
-from
-
-"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
-
-
-const sendChat =
-document.getElementById("sendChat");
-
-
-const chatInput =
-document.getElementById("chatInput");
-
-
-const chatMessages =
-document.getElementById("chatMessages");
-
-
-
-const urlParams =
-new URLSearchParams(window.location.search);
-
-
-
-const receiver =
-urlParams.get("user");
-
-
-
-if(receiver){
-
-document.getElementById("chatUser").innerText =
-receiver;
-
-}
-
-
-
-let currentUser = null;
-
-
-
-onAuthStateChanged(auth,(user)=>{
-
-
-currentUser=user;
-
-
-loadMessages();
-
-
-});
-
-
-
-
-
-// отправка сообщения
-
-if(sendChat){
-
-
-sendChat.onclick = async()=>{
-
-
-const text =
-chatInput.value.trim();
-
-
-
-if(!text || !currentUser)
-return;
-
-
-
-await addDoc(
-
-collection(db,"messages"),
-
-{
-
-
-text:text,
-
-
-sender:
-currentUser.uid,
-
-
-receiver:
-receiver,
-
-
-time:
-serverTimestamp()
-
-
-}
-
-);
-
-
-
-chatInput.value="";
-
-
-};
-
-
-}
-
-
-
-
-// загрузка сообщений
-
-
-function loadMessages(){
-
-
-if(!currentUser || !receiver)
-return;
-
-
-
-const q =
-query(
-
-collection(db,"messages"),
-
-
-where(
-"sender",
-"==",
-currentUser.uid
-),
-
-where(
-"receiver",
-"==",
-receiver
-),
-
-orderBy(
-"time"
-)
-
-);
-
-
-
-
-onSnapshot(q,(snapshot)=>{
-
-
-chatMessages.innerHTML="";
-
-
-
-snapshot.forEach((doc)=>{
-
-
-const data =
-doc.data();
-
-
-
-chatMessages.innerHTML += `
-
-
-<div class="chat-message my-message">
+<div class="message">
 
 ${data.text}
 
 </div>
 
-
 `;
 
 
-
 });
-
 
 
 });
