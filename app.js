@@ -234,3 +234,139 @@ window.location.href="login.html";
 
 
 }
+// ==================================
+// DARKWEB MESSAGES
+// ==================================
+
+
+import {
+
+collection,
+addDoc,
+onSnapshot,
+query,
+orderBy,
+serverTimestamp
+
+}
+
+from
+
+"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+
+
+
+
+const sendButton =
+document.getElementById("sendMessage");
+
+
+const messageInput =
+document.getElementById("messageInput");
+
+
+
+const messagesBox =
+document.querySelector(".messages");
+
+
+
+if(sendButton){
+
+
+sendButton.onclick = async()=>{
+
+
+const text =
+messageInput.value.trim();
+
+
+
+if(!text) return;
+
+
+
+await addDoc(
+
+collection(db,"messages"),
+
+{
+
+text:text,
+
+time:serverTimestamp()
+
+}
+
+);
+
+
+
+messageInput.value="";
+
+
+};
+
+
+}
+
+
+
+
+
+if(messagesBox){
+
+
+const q =
+query(
+
+collection(db,"messages"),
+
+orderBy("time")
+
+);
+
+
+
+onSnapshot(q,(snapshot)=>{
+
+
+messagesBox.innerHTML="";
+
+
+
+snapshot.forEach((doc)=>{
+
+
+const data =
+doc.data();
+
+
+
+messagesBox.innerHTML += `
+
+
+<div class="message">
+
+
+<p>
+
+${data.text}
+
+</p>
+
+
+</div>
+
+
+`;
+
+
+});
+
+
+});
+
+
+}
