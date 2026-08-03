@@ -567,3 +567,90 @@ ${data.text}
 
 
 }
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>DarkWeb Profile</title>
+
+<link rel="stylesheet" href="style.css">
+
+</head>
+
+
+<body>
+
+
+<div class="background"></div>
+
+
+<div class="profile-page">
+
+
+<div class="profile-card">
+
+
+<img id="avatar"
+class="avatar-big"
+src="assets/avatar.png">
+
+
+<input 
+type="file"
+id="avatarInput"
+accept="image/*">
+
+
+
+<h1 id="profileUsername">
+@username
+</h1>
+
+
+
+<textarea
+id="description"
+placeholder="Описание профиля">
+</textarea>
+
+
+
+<label>
+
+<input 
+type="checkbox"
+id="onlineStatus"
+checked>
+
+Показывать Online
+
+</label>
+
+
+
+<button id="saveProfile">
+
+Сохранить
+
+</button>
+
+
+
+</div>
+
+
+</div>
+
+
+
+<script type="module" src="app.js"></script>
+
+
+</body>
+
+</html>
