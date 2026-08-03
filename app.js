@@ -654,3 +654,107 @@ checked>
 </body>
 
 </html>
+// ==================================
+// LOAD MINI PROFILE
+// ==================================
+
+
+const miniAvatar =
+document.getElementById("miniAvatar");
+
+
+const userName =
+document.getElementById("userName");
+
+
+const userStatus =
+document.getElementById("userStatus");
+
+
+
+if(userName){
+
+
+onAuthStateChanged(auth,async(user)=>{
+
+
+if(!user)return;
+
+
+
+const snap =
+await getDoc(
+
+doc(db,"users",user.uid)
+
+);
+
+
+
+if(snap.exists()){
+
+
+const data =
+snap.data();
+
+
+
+userName.innerText =
+data.username;
+
+
+
+if(data.online === false){
+
+userStatus.innerText =
+"Offline";
+
+userStatus.style.color =
+"#777";
+
+}
+
+else{
+
+userStatus.innerText =
+"Online";
+
+}
+
+
+
+}
+
+
+
+});
+
+
+
+}
+
+
+
+
+// загрузка локального аватара
+
+
+if(miniAvatar){
+
+
+const savedAvatar =
+localStorage.getItem(
+"darkweb_avatar"
+);
+
+
+
+if(savedAvatar){
+
+miniAvatar.src =
+savedAvatar;
+
+}
+
+
+}
