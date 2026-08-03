@@ -525,3 +525,154 @@ padding:40px 20px;
 }
 
 }
+/* ===========================
+LOGIN
+=========================== */
+
+.login-page{
+
+min-height:100vh;
+
+display:flex;
+
+justify-content:center;
+
+align-items:center;
+
+padding:30px;
+
+}
+
+.login-box{
+
+width:420px;
+
+background:#101010;
+
+border:1px solid #232323;
+
+border-radius:24px;
+
+padding:40px;
+
+box-shadow:0 0 40px rgba(0,255,136,.15);
+
+backdrop-filter:blur(15px);
+
+}
+
+.login-logo{
+
+text-align:center;
+
+margin-bottom:35px;
+
+}
+
+.login-logo h1{
+
+margin-top:15px;
+
+font-size:34px;
+
+}
+
+.login-logo p{
+
+color:#888;
+
+margin-top:8px;
+
+}
+
+#loginForm{
+
+display:flex;
+
+flex-direction:column;
+
+gap:18px;
+
+}
+
+#loginForm input{
+
+background:#181818;
+
+border:1px solid #303030;
+
+color:white;
+
+padding:16px;
+
+border-radius:14px;
+
+font-size:16px;
+
+outline:none;
+
+transition:.3s;
+
+}
+
+#loginForm input:focus{
+
+border-color:#00ff88;
+
+box-shadow:0 0 15px rgba(0,255,136,.4);
+
+}
+
+#loginForm button{
+
+background:#00ff88;
+
+border:none;
+
+padding:16px;
+
+border-radius:14px;
+
+font-size:16px;
+
+font-weight:700;
+
+cursor:pointer;
+
+transition:.3s;
+
+}
+
+#loginForm button:hover{
+
+transform:translateY(-3px);
+
+box-shadow:0 0 25px #00ff88;
+
+}
+
+.login-links{
+
+margin-top:25px;
+
+display:flex;
+
+justify-content:space-between;
+
+}
+
+.login-links a{
+
+color:#999;
+
+text-decoration:none;
+
+transition:.3s;
+
+}
+
+.login-links a:hover{
+
+color:#00ff88;
+
+}
