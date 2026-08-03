@@ -1,6 +1,5 @@
-console.log("DarkWeb app.js запущен");
 // ==================================
-// DARKWEB APP.JS v1
+// DARKWEB APP.JS FINAL
 // ==================================
 
 import { auth, db } from "./firebase.js";
@@ -34,9 +33,9 @@ from
 
 
 
-// ==================================
-// РЕГИСТРАЦИЯ
-// ==================================
+// ==========================
+// REGISTER
+// ==========================
 
 const registerForm =
 document.getElementById("registerForm");
@@ -45,29 +44,28 @@ document.getElementById("registerForm");
 if(registerForm){
 
 
-registerForm.addEventListener("submit", async(e)=>{
+registerForm.onsubmit = async(e)=>{
 
 
 e.preventDefault();
 
 
 const username =
-document.getElementById("username").value.trim();
+document.getElementById("username").value;
 
 
 const email =
-document.getElementById("registerEmail").value.trim();
+document.getElementById("registerEmail").value;
 
 
 const password =
 document.getElementById("registerPassword").value;
 
 
-
 try{
 
 
-const result =
+const user =
 await createUserWithEmailAndPassword(
 auth,
 email,
@@ -78,7 +76,7 @@ password
 
 await setDoc(
 
-doc(db,"users",result.user.uid),
+doc(db,"users",user.user.uid),
 
 {
 
@@ -89,11 +87,13 @@ username
 :
 "@"+username,
 
-email:email,
+email,
+
+online:true,
 
 description:"",
 
-created:
+lastOnline:
 new Date()
 
 }
@@ -102,22 +102,19 @@ new Date()
 
 
 
-alert("DarkWeb аккаунт создан 🟢");
-
-
-window.location.href="home.html";
+location.href="home.html";
 
 
 }
 
-catch(error){
+catch(e){
 
-alert(error.message);
+alert(e.message);
 
 }
 
 
-});
+};
 
 
 }
@@ -125,10 +122,10 @@ alert(error.message);
 
 
 
+// ==========================
+// LOGIN
+// ==========================
 
-// ==================================
-// ВХОД
-// ==================================
 
 const loginForm =
 document.getElementById("loginForm");
@@ -137,19 +134,10 @@ document.getElementById("loginForm");
 if(loginForm){
 
 
-loginForm.addEventListener("submit",async(e)=>{
+loginForm.onsubmit = async(e)=>{
 
 
 e.preventDefault();
-
-
-const email =
-document.getElementById("email").value.trim();
-
-
-const password =
-document.getElementById("password").value;
-
 
 
 try{
@@ -159,105 +147,23 @@ await signInWithEmailAndPassword(
 
 auth,
 
-email,
+document.getElementById("email").value,
 
-password
+document.getElementById("password").value
 
 );
 
 
-
-window.location.href="home.html";
-
-
-}
-
-catch(error){
-
-alert(
-"Ошибка входа: "
-+
-error.message
-);
-
-}
-
-
-});
+location.href="home.html";
 
 
 }
 
+catch(e){
 
-
-
-
-// ==================================
-// ПРОВЕРКА ПОЛЬЗОВАТЕЛЯ
-// ==================================
-
-onAuthStateChanged(auth,(user)=>{
-
-
-const protectedPages=[
-
-"home.html",
-"profile.html",
-"contacts.html",
-"chat.html"
-
-];
-
-
-const page =
-window.location.pathname;
-
-
-
-if(
-
-protectedPages.some(
-(item)=>page.includes(item)
-)
-
-&&
-!user
-
-){
-
-
-window.location.href="login.html";
-
+alert(e.message);
 
 }
-
-
-
-});
-
-
-
-
-
-
-// ==================================
-// ВЫХОД
-// ==================================
-
-const logout =
-document.getElementById("logout");
-
-
-if(logout){
-
-
-logout.onclick=async()=>{
-
-
-await signOut(auth);
-
-
-window.location.href="login.html";
 
 
 };
@@ -269,11 +175,105 @@ window.location.href="login.html";
 
 
 
-// ==================================
-// ПРОФИЛЬ
-// ==================================
+// ==========================
+// ONLINE SYSTEM
+// ==========================
 
-const profileUsername =
+
+onAuthStateChanged(auth,async(user)=>{
+
+
+if(user){
+
+
+await updateDoc(
+
+doc(db,"users",user.uid),
+
+{
+
+online:true,
+
+lastOnline:new Date()
+
+}
+
+);
+
+
+}
+
+
+
+});
+
+
+
+
+
+
+// ==========================
+// LOGOUT
+// ==========================
+
+
+const logout =
+document.getElementById("logout");
+
+
+if(logout){
+
+
+logout.onclick=async()=>{
+
+
+const user =
+auth.currentUser;
+
+
+if(user){
+
+
+await updateDoc(
+
+doc(db,"users",user.uid),
+
+{
+
+online:false,
+
+lastOnline:new Date()
+
+}
+
+);
+
+
+}
+
+
+
+await signOut(auth);
+
+
+location.href="login.html";
+
+
+};
+
+
+}
+
+
+
+
+
+// ==========================
+// PROFILE
+// ==========================
+
+
+const profileName =
 document.getElementById("profileUsername");
 
 
@@ -286,18 +286,21 @@ document.getElementById("saveProfile");
 
 
 
-if(profileUsername){
+if(profileName){
 
 
 onAuthStateChanged(auth,async(user)=>{
 
 
-if(user){
+if(!user)return;
+
 
 
 const snap =
 await getDoc(
+
 doc(db,"users",user.uid)
+
 );
 
 
@@ -310,16 +313,12 @@ snap.data();
 
 
 
-profileUsername.innerText =
+profileName.innerText =
 data.username;
-
 
 
 description.value =
 data.description || "";
-
-
-}
 
 
 }
@@ -343,10 +342,6 @@ const user =
 auth.currentUser;
 
 
-if(!user)return;
-
-
-
 await updateDoc(
 
 doc(db,"users",user.uid),
@@ -361,8 +356,7 @@ description.value
 );
 
 
-
-alert("Профиль обновлён 🟢");
+alert("Сохранено");
 
 
 };
@@ -374,10 +368,10 @@ alert("Профиль обновлён 🟢");
 
 
 
+// ==========================
+// SEARCH USERS
+// ==========================
 
-// ==================================
-// ПОИСК ПОЛЬЗОВАТЕЛЕЙ
-// ==================================
 
 const searchButton =
 document.getElementById("searchButton");
@@ -398,19 +392,14 @@ if(searchButton){
 searchButton.onclick=async()=>{
 
 
-const search =
-searchInput.value.trim();
-
-
-
-results.innerHTML="";
-
-
-
 const users =
 await getDocs(
 collection(db,"users")
 );
+
+
+
+results.innerHTML="";
 
 
 
@@ -423,23 +412,31 @@ item.data();
 
 
 if(
-
-data.username === search
-||
-data.username === "@"+search.replace("@","")
-
+data.username === searchInput.value
 ){
+
 
 
 results.innerHTML += `
 
-<div class="user-result">
+<div class="user-result"
 
-<h3>${data.username}</h3>
+onclick="openChat('${item.id}','${data.username}')">
+
+
+<h3>
+
+${data.username}
+
+</h3>
+
 
 <span>
-🟢 DarkWeb User
+
+${data.online ? "🟢 Online":"⚫ Offline"}
+
 </span>
+
 
 </div>
 
@@ -447,7 +444,6 @@ results.innerHTML += `
 
 
 }
-
 
 
 });
@@ -461,67 +457,88 @@ results.innerHTML += `
 
 
 
-
-// ==================================
-// ОБЩИЙ ЧАТ
-// ==================================
-
-const sendMessage =
-document.getElementById("sendMessage");
+window.openChat=function(uid,name){
 
 
-const messageInput =
-document.getElementById("messageInput");
-
-
-const messages =
-document.querySelector(".messages");
-
-
-
-if(sendMessage){
-
-
-sendMessage.onclick=async()=>{
-
-
-const text =
-messageInput.value.trim();
-
-
-
-if(!text)return;
-
-
-
-await addDoc(
-
-collection(db,"messages"),
-
-{
-
-text:text,
-
-time:serverTimestamp()
-
-}
-
-);
-
-
-
-messageInput.value="";
+location.href =
+"chat.html?uid="+uid+"&name="+name;
 
 
 };
 
 
+
+
+
+
+// ==========================
+// PRIVATE CHAT
+// ==========================
+
+
+const chatMessages =
+document.getElementById("chatMessages");
+
+
+const chatInput =
+document.getElementById("chatInput");
+
+
+const sendChat =
+document.getElementById("sendChat");
+
+
+const params =
+new URLSearchParams(location.search);
+
+
+const receiverUID =
+params.get("uid");
+
+
+const receiverName =
+params.get("name");
+
+
+
+const chatTitle =
+document.getElementById("chatUser");
+
+
+if(chatTitle){
+
+chatTitle.innerText =
+receiverName;
+
 }
 
 
 
+let myUID=null;
 
-if(messages){
+
+
+onAuthStateChanged(auth,(user)=>{
+
+
+if(user){
+
+myUID=user.uid;
+
+loadChat();
+
+}
+
+
+});
+
+
+
+function loadChat(){
+
+
+if(!chatMessages)return;
+
 
 
 const q =
@@ -538,7 +555,8 @@ orderBy("time")
 onSnapshot(q,(snap)=>{
 
 
-messages.innerHTML="";
+chatMessages.innerHTML="";
+
 
 
 snap.forEach((item)=>{
@@ -549,494 +567,41 @@ item.data();
 
 
 
-messages.innerHTML += `
-
-<div class="message">
-
-${data.text}
-
-</div>
-
-`;
-
-
-});
-
-
-});
-
-
-}
-<!DOCTYPE html>
-<html lang="ru">
-
-<head>
-
-<meta charset="UTF-8">
-
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>DarkWeb Profile</title>
-
-<link rel="stylesheet" href="style.css">
-
-</head>
-
-
-<body>
-
-
-<div class="background"></div>
-
-
-<div class="profile-page">
-
-
-<div class="profile-card">
-
-
-<img id="avatar"
-class="avatar-big"
-src="assets/avatar.png">
-
-
-<input 
-type="file"
-id="avatarInput"
-accept="image/*">
-
-
-
-<h1 id="profileUsername">
-@username
-</h1>
-
-
-
-<textarea
-id="description"
-placeholder="Описание профиля">
-</textarea>
-
-
-
-<label>
-
-<input 
-type="checkbox"
-id="onlineStatus"
-checked>
-
-Показывать Online
-
-</label>
-
-
-
-<button id="saveProfile">
-
-Сохранить
-
-</button>
-
-
-
-</div>
-
-
-</div>
-
-
-
-<script type="module" src="app.js"></script>
-
-
-</body>
-
-</html>
-// ==================================
-// LOAD MINI PROFILE
-// ==================================
-
-
-const miniAvatar =
-document.getElementById("miniAvatar");
-
-
-const userName =
-document.getElementById("userName");
-
-
-const userStatus =
-document.getElementById("userStatus");
-
-
-
-if(userName){
-
-
-onAuthStateChanged(auth,async(user)=>{
-
-
-if(!user)return;
-
-
-
-const snap =
-await getDoc(
-
-doc(db,"users",user.uid)
-
-);
-
-
-
-if(snap.exists()){
-
-
-const data =
-snap.data();
-
-
-
-userName.innerText =
-data.username;
-
-
-
-if(data.online === false){
-
-userStatus.innerText =
-"Offline";
-
-userStatus.style.color =
-"#777";
-
-}
-
-else{
-
-userStatus.innerText =
-"Online";
-
-}
-
-
-
-}
-
-
-
-});
-
-
-
-}
-
-
-
-
-// загрузка локального аватара
-
-
-if(miniAvatar){
-
-
-const savedAvatar =
-localStorage.getItem(
-"darkweb_avatar"
-);
-
-
-
-if(savedAvatar){
-
-miniAvatar.src =
-savedAvatar;
-
-}
-
-
-}
-// ==================================
-// DARKWEB CHAT LIST
-// ==================================
-
-
-const chatList =
-document.getElementById("chatList");
-
-
-
-if(chatList){
-
-
-onAuthStateChanged(auth,async(user)=>{
-
-
-if(!user)return;
-
-
-
-const users =
-await getDocs(
-collection(db,"users")
-);
-
-
-
-chatList.innerHTML="";
-
-
-
-users.forEach((item)=>{
-
-
-if(item.id !== user.uid){
-
-
-const data =
-item.data();
-
-
-
-chatList.innerHTML += `
-
-
-<div class="chat-item"
-onclick="openChat('${data.username}')">
-
-
-<img 
-class="chat-avatar"
-src="assets/avatar.png">
-
-
-<div class="chat-info">
-
-
-<h3>
-
-${data.username}
-
-</h3>
-
-
-<p>
-
-🟢 Начать диалог
-
-</p>
-
-
-</div>
-
-
-</div>
-
-
-`;
-
-
-
-}
-
-
-});
-
-
-});
-
-
-}
-
-
-
-// открыть чат
-
-
-window.openChat=function(username){
-
-
-window.location.href =
-"chat.html?user="+username;
-
-
-}
-// ==================================
-// TELEGRAM STYLE PRIVATE CHAT
-// ==================================
-
-
-const chatMessages =
-document.getElementById("chatMessages");
-
-
-const chatInput =
-document.getElementById("chatInput");
-
-
-const sendChat =
-document.getElementById("sendChat");
-
-
-
-const params =
-new URLSearchParams(
-window.location.search
-);
-
-
-const chatUsername =
-params.get("user");
-
-
-
-const chatTitle =
-document.getElementById("chatUser");
-
-
-if(chatTitle){
-
-chatTitle.innerText =
-chatUsername;
-
-}
-
-
-
-let myUID = null;
-
-
-
-onAuthStateChanged(auth,(user)=>{
-
-
-if(user){
-
-
-myUID =
-user.uid;
-
-
-loadPrivateMessages();
-
-
-}
-
-
-});
-
-
-
-
-
-async function loadPrivateMessages(){
-
-
-if(!chatMessages)
-return;
-
-
-
-const messagesQuery =
-query(
-
-collection(db,"messages"),
-
-orderBy("time")
-
-);
-
-
-
-onSnapshot(messagesQuery,(snapshot)=>{
-
-
-chatMessages.innerHTML="";
-
-
-
-snapshot.forEach((item)=>{
-
-
-const data =
-item.data();
-
-
-
 if(
 
-(data.sender === myUID &&
-data.receiver === chatUsername)
+(data.sender===myUID &&
+data.receiver===receiverUID)
 
 ||
 
-(data.sender === chatUsername &&
-data.receiver === myUID)
+(data.sender===receiverUID &&
+data.receiver===myUID)
 
 ){
 
 
 
-const mine =
-data.sender === myUID;
-
-
-
 chatMessages.innerHTML += `
 
-
-<div class="chat-message 
-${mine ? "my-message" : "other-message"}">
-
+<div class="chat-message">
 
 ${data.text}
 
-
-<span class="message-time">
-
-${
-
-data.time ?
-
-new Date(
-data.time.toDate()
-).toLocaleTimeString()
-
-:
-
-""
-
-}
-
-</span>
-
-
 </div>
-
 
 `;
 
-
-
 }
 
 
-
 });
-
-
-
-chatMessages.scrollTop =
-chatMessages.scrollHeight;
-
 
 
 });
 
 
 }
+
 
 
 
@@ -1051,7 +616,6 @@ const text =
 chatInput.value.trim();
 
 
-
 if(!text)return;
 
 
@@ -1062,11 +626,11 @@ collection(db,"messages"),
 
 {
 
-text:text,
+text,
 
 sender:myUID,
 
-receiver:chatUsername,
+receiver:receiverUID,
 
 time:serverTimestamp()
 
