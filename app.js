@@ -758,3 +758,108 @@ savedAvatar;
 
 
 }
+// ==================================
+// DARKWEB CHAT LIST
+// ==================================
+
+
+const chatList =
+document.getElementById("chatList");
+
+
+
+if(chatList){
+
+
+onAuthStateChanged(auth,async(user)=>{
+
+
+if(!user)return;
+
+
+
+const users =
+await getDocs(
+collection(db,"users")
+);
+
+
+
+chatList.innerHTML="";
+
+
+
+users.forEach((item)=>{
+
+
+if(item.id !== user.uid){
+
+
+const data =
+item.data();
+
+
+
+chatList.innerHTML += `
+
+
+<div class="chat-item"
+onclick="openChat('${data.username}')">
+
+
+<img 
+class="chat-avatar"
+src="assets/avatar.png">
+
+
+<div class="chat-info">
+
+
+<h3>
+
+${data.username}
+
+</h3>
+
+
+<p>
+
+🟢 Начать диалог
+
+</p>
+
+
+</div>
+
+
+</div>
+
+
+`;
+
+
+
+}
+
+
+});
+
+
+});
+
+
+}
+
+
+
+// открыть чат
+
+
+window.openChat=function(username){
+
+
+window.location.href =
+"chat.html?user="+username;
+
+
+}
