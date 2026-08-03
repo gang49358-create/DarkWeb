@@ -370,3 +370,126 @@ ${data.text}
 
 
 }
+// ==================================
+// DARKWEB PROFILE
+// ==================================
+
+import {
+getDoc,
+updateDoc
+}
+from
+"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+import {
+onAuthStateChanged
+}
+from
+"https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+
+// Элементы профиля
+
+const profileUsername =
+document.getElementById("profileUsername");
+
+const descriptionInput =
+document.getElementById("description");
+
+const saveProfile =
+document.getElementById("saveProfile");
+
+
+
+// загрузка профиля
+
+if(profileUsername){
+
+
+onAuthStateChanged(auth, async(user)=>{
+
+
+if(user){
+
+
+const userRef =
+doc(db,"users",user.uid);
+
+
+
+const userSnap =
+await getDoc(userRef);
+
+
+
+if(userSnap.exists()){
+
+
+const data =
+userSnap.data();
+
+
+
+profileUsername.innerText =
+data.username;
+
+
+
+descriptionInput.value =
+data.description || "";
+
+
+}
+
+
+
+}
+
+
+});
+
+
+}
+
+
+
+
+// сохранение описания
+
+if(saveProfile){
+
+
+saveProfile.onclick = async()=>{
+
+
+const user =
+auth.currentUser;
+
+
+
+if(!user) return;
+
+
+
+await updateDoc(
+
+doc(db,"users",user.uid),
+
+{
+
+description:
+descriptionInput.value
+
+}
+
+);
+
+
+
+alert("Профиль сохранён 🟢");
+
+
+};
+
+
+}
